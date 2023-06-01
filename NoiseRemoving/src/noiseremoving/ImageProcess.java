@@ -97,9 +97,9 @@ public class ImageProcess {
     public void removeNoise()
     {
         int width = buffered_image.getWidth();
-        int hight = buffered_image.getHeight();
+        int height = buffered_image.getHeight();
         WritableRaster writeable_raster = buffered_image.getRaster();
-        for(int i = 1; i < hight-1; i++)
+        for(int i = 1; i < height-1; i++)
         {
             for(int j = 1; j < width-1; j++)
             {
@@ -136,17 +136,26 @@ public class ImageProcess {
                 // please add your code here
                 // start of your code (take as many lines as you need)
                 // 1. create CollectionSort object 
+                CollectionSort<Integer> collectionSort = new CollectionSort<>();
                 
                 // 2. pass intensity_r[] to the CollectionSort object   
+                collectionSort.setArray(intensity_r);
                 
                 // 3. call quickSort() from CollectionSort object
+                collectionSort.quickSort();
                 
-                // 4. do steps 2 and 3 for intensity_g and intensity_b                                
+                // 4. do steps 2 and 3 for intensity_g and intensity_b       
+                collectionSort.setArray(intensity_g);
+                collectionSort.quickSort();
+
+                collectionSort.setArray(intensity_b);
+                collectionSort.quickSort();                         
                 
                 // end of your code
                 
                 // index 4 always points to medain after sorting
                 // replace the pixel's each channel value by the median
+              
                 pixel[2] = intensity_b[4];      
                 pixel[1] = intensity_g[4];      
                 pixel[0] = intensity_r[4];

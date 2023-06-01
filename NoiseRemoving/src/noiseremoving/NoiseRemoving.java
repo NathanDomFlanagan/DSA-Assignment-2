@@ -12,7 +12,8 @@ import javax.swing.JFileChooser;
  *
  * @author xhu
  */
-public class NoiseRemoving {
+public class NoiseRemoving 
+{
 
     /**
      * @param args the command line arguments

@@ -7,23 +7,21 @@ package memoapp;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
  * @author xhu
  */
-public class MemoManager<E>  {
+public class MemoManager<E, F extends Comparable<F>> {
     
-    private BinaryTree<Memo, Date> bTreeDate;
-    private BinaryTree<Memo, String> bTreeTitle;
+    private BinaryTree<Memo, F> bTreeDate;
+    private BinaryTree<Memo, F> bTreeTitle;
     
 
     public MemoManager() {
-        bTreeDate = new BinaryTree<Memo, Date>();
-        bTreeTitle = new BinaryTree<Memo, String>();
+        bTreeDate = new BinaryTree<Memo, F>();
+        bTreeTitle = new BinaryTree<Memo, F>();
     }
     
     public void addMemo(String date, String title, String message)
@@ -60,47 +58,59 @@ public class MemoManager<E>  {
     public void addToTree(Memo memo, Boolean isKeyDate)
     {
         if(isKeyDate) {
-            bTreeDate.addElement(memo, memo.getDate());
-            // TODO uncomment
-            //}else {
-
-            //bTreeTitle.addElement(memo, memo.getTitle());
+            bTreeDate.addElement(memo, (F) memo.getDate());
+        }else {
+            bTreeTitle.addElement(memo, (F) memo.getTitle());
         }
     }
     
     public Memo findMemo(E key)
     {
         if(key instanceof String) {
-            return bTreeTitle.searchElement((String) key);
+            return bTreeTitle.searchElement((F) key);
         } else {
-            return bTreeDate.searchElement((Date) key);
+            return bTreeDate.searchElement((F) key);
         }
     }
     
-    public Memo[] getSortedMemoList(E key)
+    public Memo[] getSortedMemoList(F key)
     {
-        ArrayList<Memo> list = new ArrayList<Memo>();
+        
+        int numberOfNodes = getNumberOfNodes(key);
+        Memo[] memoList = new Memo[numberOfNodes];
 
-        if (key instanceof String) {
-             Node<Memo, String>[] nodes = bTreeTitle.toSortedList();
-
-             for (Node<Memo,String> node : nodes) {
-                list.add(node.element);
-             }
-        } else {
-            Node<Memo, Date>[] nodes = bTreeDate.toSortedList();
-
-            for (Node<Memo,Date> node : nodes) {
-               list.add(node.element);
-            }
-        }
-
-        return list.toArray(new Memo[list.size()]);
+        Node<Memo, F>[] nodes = getSortedListNodes(key);
+        
+        for(int i = 0; i < numberOfNodes; i++) {
+            memoList[i] = nodes[i].element;
+        } 
+            
+        return memoList;
     }
     
     public void reverseOrder()
     {
-        
+        bTreeDate.reverseOrder();
+        bTreeTitle.reverseOrder();
+    }
+
+    private int getNumberOfNodes(F key) {
+        if(key instanceof String) {
+            return bTreeTitle.getNumberOfNodes();
+        }
+
+        return bTreeDate.getNumberOfNodes();
+    }
+
+    private Node<Memo, F>[] getSortedListNodes(F key) {
+        // check if key is a Title (string)
+        if (key instanceof String) {
+            // note toSortedList returns Descending order
+            return bTreeTitle.toSortedList();             
+
+        } 
+        // otherwise we can assume that it is a Date
+        return bTreeDate.toSortedList();                   
     }
     
 }

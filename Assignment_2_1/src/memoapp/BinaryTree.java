@@ -34,6 +34,11 @@ public class BinaryTree <E, F extends Comparable<F>> {
         this.number_of_nodes = 1;
         this.nodeList = null;
     }
+
+    public int getNumberOfNodes()
+    {
+        return number_of_nodes;
+    }
     
     public BinaryTree()
     {
@@ -46,22 +51,46 @@ public class BinaryTree <E, F extends Comparable<F>> {
     {
         Node<E, F> newNode = new Node<>(element, key);
 
-        addNode(root, newNode);
-
+        // Adds a new node to the binary tree 
+        if(this.root == null) {
+             // If the root is null, the new node becomes the root
+            root = newNode;
+        } else {
+            addNode(root, newNode);
+        }
+        
+        number_of_nodes++;
         // TEST just a placeholder to see all nodes that have been added
-        allNodes.add(newNode);
+        //allNodes.add(newNode);
     }
 
     public ArrayList<Node<E,F>> getAllNodes() {
         return this.allNodes;
     }
     
-    private void addNode(Node<E, F> root, Node<E, F> node)
-    {       
-        // Adds a new node to the binary tree 
+    private void addNode(Node<E, F> currentNode, Node<E, F> targetNode)
+    {
+        int comparisonResult = targetNode.compareTo(currentNode);
+
+        if(comparisonResult < 0) {
+            // If the new node's key is less than the root's key,
+            // recursively add the node to the left subtree
+            if(currentNode.left == null) {
+                currentNode.left = targetNode;
+            } else {
+                addNode(currentNode.left, targetNode);
+            }
+        } else {
+            if(currentNode.right == null) { 
+                currentNode.right = targetNode;
+            } else {
+                addNode(currentNode.right, targetNode);
+            }
+        }
+        
+        /* 
         if (this.root == null) 
         {
-            // If the root is null, the new node becomes the root
             this.root = node;
         } else {
             int comparisonResult = node.compareTo(root);
@@ -88,7 +117,7 @@ public class BinaryTree <E, F extends Comparable<F>> {
                 }
             }
         }
-        number_of_nodes++;
+        */
     }
     
     public void traversal(Node<E, F> root)
@@ -112,19 +141,21 @@ public class BinaryTree <E, F extends Comparable<F>> {
     //!: This could cause problems
     @SuppressWarnings("unchecked")
     public Node<E, F>[] toSortedList()
-    {
-        nodeList = new Node[number_of_nodes];
-        toSortedList(root);
-        return nodeList;
+    {       
+        // right now this is returning in Descending order
+        Node<E,F>[] nodes = new Node[this.number_of_nodes];
+        int[] index = {0};
+        toSortedList(root, nodes, index);
+        return nodes;
     }
     
-    private void toSortedList(Node<E, F> root)
+    private void toSortedList(Node<E, F> currentNode, Node<E, F>[] nodes, int[] index)
     {
-        if (root != null) 
+        if (currentNode != null) 
         {
-            toSortedList(root.left);
-            nodeList[--number_of_nodes] = root;
-            toSortedList(root.right);
+            toSortedList(currentNode.left, nodes, index);
+            nodes[index[0]++] = currentNode;
+            toSortedList(currentNode.right, nodes, index);
         }
     }
     
@@ -139,30 +170,30 @@ public class BinaryTree <E, F extends Comparable<F>> {
         return null;
     }
        
-    public Node<E, F> searchNode(Node<E, F> root, Node<E, F> node)
+    public Node<E, F> searchNode(Node<E, F> currentNode, Node<E, F> targetNode)
     {
         // Searches for a node with the specified key in the binary tree
 
-        if (root == null || node == null) 
+        if (currentNode == null || targetNode == null) 
         {
             // If the root or node is null, the search is unsuccessful
             return null;
         }
-        int comparisonResult = node.compareTo(root);
+        int comparisonResult = targetNode.compareTo(currentNode);
         if (comparisonResult == 0) 
         {
             // If the keys match, the node is found and returned
-            return root;
+            return currentNode;
         } else if (comparisonResult < 0) 
         {
             // If the new node's key is less than the root's key,
             // recursively search in the left subtree
-            return searchNode(root.left, node);
+            return searchNode(currentNode.left, targetNode);
         } else 
         {
             // If the new node's key is greater than the root's key,
             // recursively search in the right subtree
-            return searchNode(root.right, node);
+            return searchNode(currentNode.right, targetNode);
         }
     }
     
@@ -171,22 +202,27 @@ public class BinaryTree <E, F extends Comparable<F>> {
         reverseOrder(root);
     }
     
-    private void reverseOrder(Node<E, F> root)
+    private void reverseOrder(Node<E, F> currentNode)
     {
         // Performs a reverse-order traversal of the binary tree
 
-        if (root != null) 
+        if (currentNode != null) 
         {
             // If the root is not null, perform the traversal
 
+            // swap the left and the right subtrees of each node
+            Node<E,F> tempNode = currentNode.left;
+            currentNode.left = currentNode.right;
+            currentNode.right = tempNode;
+
             // Traverse the right subtree
-            reverseOrder(root.right);
+            reverseOrder(currentNode.right);
 
             // Process the current node (root) then print the element
-            System.out.println(root.element);
+            System.out.println(currentNode.element);
 
             // Traverse the left subtree
-            reverseOrder(root.left);
+            reverseOrder(currentNode.left);
         }
     }
 }
